@@ -24,6 +24,7 @@ def get_upload_params(request):
     acl = dest.get('acl')
     bucket = dest.get('bucket')
     cache_control = dest.get('cache_control')
+    url_prefix = dest.get('url_prefix')
     content_disposition = dest.get('content_disposition')
     content_length_range = dest.get('content_length_range')
     server_side_encryption = dest.get('server_side_encryption')
@@ -80,7 +81,8 @@ def get_upload_params(request):
 
     data = create_upload_data(
         content_type, key, acl, bucket, cache_control, content_disposition,
-        content_length_range, server_side_encryption, access_key, secret_access_key, token
+        content_length_range, server_side_encryption, access_key,
+        secret_access_key, token, url_prefix
     )
 
     return HttpResponse(json.dumps(data), content_type="application/json")

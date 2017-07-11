@@ -40,6 +40,13 @@
         return url;
     }
 
+    var parseKey = function(text) {
+        var xml = new DOMParser().parseFromString(text, 'text/xml'),
+            tag = xml.getElementsByTagName('Key')[0]
+
+        return tag.childNodes[0].nodeValue
+    }
+
     var parseNameFromUrl = function(url) {
         return decodeURIComponent((url + '').replace(/\+/g, '%20'));
     }
@@ -66,11 +73,16 @@
         alert(msg)
     }
 
-    var update = function(el, xml) {
+    var update = function(el, xml, urlPrefix) {
         var link = el.querySelector('.file-link'),
             url  = el.querySelector('.file-url')
 
-        url.value = parseURL(xml)
+        if (typeof urlPrefix === 'undefined' || urlPrefix === null) {
+            url.value = parseURL(xml)
+        } else {
+            url.value = [urlPrefix, parseKey(xml)].join('/')
+        }
+
         link.setAttribute('href', url.value)
         link.innerHTML = parseNameFromUrl(url.value).split('/').pop();
 
@@ -101,8 +113,11 @@
         if (data === null) return error(el, 'Sorry, could not get upload URL.')
 
         el.className = 's3direct progress-active'
-        var url  = data['form_action']
+        var url  = data['form_action'],
+            urlPrefix = data['url_prefix']
+
         delete data['form_action']
+        delete data['url_prefix']
 
         Object.keys(data).forEach(function(key){
             form.append(key, data[key])
@@ -121,7 +136,7 @@
 
                 return error(el, 'Sorry, failed to upload file.')
             }
-            update(el, xml)
+            update(el, xml, urlPrefix)
         })
     }
 

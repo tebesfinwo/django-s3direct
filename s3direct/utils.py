@@ -34,6 +34,7 @@ def get_s3direct_destinations():
         5: 'cache_control',
         6: 'content_disposition',
         7: 'server_side_encryption',
+        8: 'url_prefix',
     }
     if destinations:
         for dest, dest_value in destinations.items():
@@ -49,7 +50,8 @@ def get_s3direct_destinations():
 
 def create_upload_data(content_type, key, acl, bucket=None, cache_control=None,
                        content_disposition=None, content_length_range=None,
-                       server_side_encryption=None, access_key=None, secret_access_key=None, token=None):
+                       server_side_encryption=None, access_key=None,
+                       secret_access_key=None, token=None, url_prefix=None):
 
     bucket = bucket or settings.AWS_STORAGE_BUCKET_NAME
     region = getattr(settings, 'S3DIRECT_REGION', None)
@@ -153,5 +155,8 @@ def create_upload_data(content_type, key, acl, bucket=None, cache_control=None,
 
     if content_disposition:
         return_dict['Content-Disposition'] = content_disposition
+
+    if url_prefix:
+        return_dict['url_prefix'] = url_prefix
 
     return return_dict

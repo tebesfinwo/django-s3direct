@@ -27,8 +27,7 @@ HTML_OUTPUT = (
 FOO_RESPONSE = {
     u'x-amz-algorithm': u'AWS4-HMAC-SHA256',
     u'form_action': u'https://s3.amazonaws.com/{}'.format(settings.AWS_STORAGE_BUCKET_NAME),
-    u'success_action_status': 201,
-    u'acl': u'public-read',
+    u'success_action_status': 201, u'acl': u'public-read',
     u'key': u'uploads/imgs/${filename}',
     u'content-type': u'image/jpeg'
 }
@@ -135,6 +134,14 @@ class WidgetTestCase(TestCase):
         self.assertEqual(
                 conditions_dict[10]['x-amz-server-side-encryption'], u'AES256')
 
+    def check_url_prefix(self):
+        data = {u'dest': u'pdfs', u'name': u'foo.pdf',
+                u'type': u'application/pdf'}
+        response = self.client.post(reverse('s3direct'), data)
+        self.assertEqual(response.status_code, 200)
+        response_dict = json.loads(response.content.decode())
+        self.assertEqual(response_dict['url_prefix'], 'https://www.example.com')
+
 
 @override_settings(S3DIRECT_DESTINATIONS={
     'misc': (lambda original_filename: 'images/unique.jpg',),
@@ -144,6 +151,9 @@ class WidgetTestCase(TestCase):
     'cached': ('uploads/vids', lambda u: u.is_authenticated(), '*',
                'authenticated-read', 'astoragebucketname', 'max-age=2592000',
                'attachment', 'AES256'),
+    'pdfs': ('uploads/vids', lambda u: True, 'application/pdf',
+             'authenticated-read', 'astoragebucketname', 'max-age=2592000',
+             'attachment', 'AES256', 'https://www.example.com'),
 })
 class OldStyleSettingsWidgetTest(WidgetTestCase):
     """
@@ -187,6 +197,9 @@ class OldStyleSettingsWidgetTest(WidgetTestCase):
     def test_policy_conditions(self):
         self.check_policy_conditions()
 
+    def test_url_prefix(self):
+        self.check_url_prefix()
+
 
 class WidgetTest(WidgetTestCase):
 
@@ -225,6 +238,9 @@ class WidgetTest(WidgetTestCase):
 
     def test_policy_conditions(self):
         self.check_policy_conditions()
+
+    def test_url_prefix(self):
+        self.check_url_prefix()
 
     """Tests for features only available with new-style settings"""
     def test_content_length_range(self):
