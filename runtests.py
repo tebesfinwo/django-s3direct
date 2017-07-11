@@ -69,6 +69,11 @@ settings.configure(
             'cache_control': 'max-age=2592000',
             'content_disposition': 'attachment',
             'server_side_encryption': 'AES256',
+        },
+        'pdfs': {
+            'key': 'uploads/pdfs',
+            'auth': lambda u: True,
+            'url_prefix': 'https://www.example.com',
         }
     }
 )

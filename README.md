@@ -118,6 +118,7 @@ S3DIRECT_REGION = 'us-east-1'
 # content_disposition [optional] Useful for sending files as attachments.
 # bucket [optional] Specify a different bucket for this particular object.
 # server_side_encryption [optional] Encryption headers for buckets that require it.
+# url_prefix [optional] URL prefix for uploaded file instead of S3 bucket endpoint.
 
 S3DIRECT_DESTINATIONS = {
     'example_destination': {
@@ -133,6 +134,7 @@ S3DIRECT_DESTINATIONS = {
         'content_disposition': 'attachment',  # Default no content disposition
         'content_length_range': (5000, 20000000), # Default allow any size
         'server_side_encryption': 'AES256', # Default no encryption
+        'url_prefix': 'https://static.example.com', # Default to S3 endpoint
     }
 }
 ```
